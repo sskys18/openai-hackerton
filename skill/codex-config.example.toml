@@ -1,0 +1,12 @@
+# Add this block to ~/.codex/config.toml to register Culprit as an MCP server.
+# Replace the absolute path and API key.
+
+[mcp_servers.culprit]
+command = "bun"
+args = ["run", "/absolute/path/to/culprit/src/server.ts"]
+
+[mcp_servers.culprit.env]
+OPENAI_API_KEY = "sk-..."
+CULPRIT_MODEL = "gpt-5.6"
+CULPRIT_MAX_BISECT_STEPS = "25"
+CULPRIT_CMD_TIMEOUT = "300"
