@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 // Culprit MCP server. Speaks MCP over stdio so Codex can bind its tools.
-// Tool schemas are final; handlers land in milestones M2/M3 (see PLAN.md).
+// Deterministic tools work today; GPT-5.6 reasoning tools need OPENAI_API_KEY.
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -8,6 +8,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { zodToJsonSchema } from "zod-to-json-schema";
 
 import { tools } from "./tools/index.ts";
 
@@ -20,8 +21,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: tools.map((t) => ({
     name: t.name,
     description: t.description,
-    // TODO(M4): convert zod schema -> JSON schema (zod-to-json-schema).
-    inputSchema: { type: "object" },
+    inputSchema: zodToJsonSchema(t.input, { target: "openApi3" }),
   })),
 }));
 

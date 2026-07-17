@@ -78,10 +78,10 @@ Shared helpers:
 ## Milestones
 
 - [x] M0 Setup: repo, scaffolding, docs, demo fixture, submission checklist.
-- [ ] M1 exec.ts + git.ts helpers with tests.
-- [ ] M2 reproduce_failure + find_regression (deterministic core, GPT-free).
-- [ ] M3 llm.ts + explain_commit + propose_fix (GPT-5.6).
-- [ ] M4 MCP wiring, config snippet, end-to-end run on fixture.
+- [x] M1 exec.ts + git.ts helpers with tests. (3 tests pass)
+- [x] M2 reproduce_failure + find_regression (deterministic core, GPT-free).
+- [ ] M3 llm.ts + explain_commit + propose_fix (GPT-5.6). NEXT
+- [x] M4 MCP wiring (real JSON schemas), end-to-end tools/call on fixture verified.
 - [ ] M5 README polish, 3-min demo script, record video, submit.
 
 ## Demo (the money shot for the video)

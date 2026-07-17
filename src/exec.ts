@@ -1,4 +1,4 @@
-// Sandboxed command runner: run a shell command in a repo dir with a timeout,
+// Sandboxed command runner: run a command in a repo dir with a timeout,
 // capturing stdout/stderr/exit code. Used by reproduce_failure and the bisect
 // predicate. Deterministic, no LLM.
 
@@ -18,14 +18,38 @@ export interface ExecOptions {
 const DEFAULT_TIMEOUT_SEC = Number(process.env.CULPRIT_CMD_TIMEOUT ?? 300);
 
 /**
- * Run `cmd` via `sh -c` inside `cwd`. Never throws on non-zero exit; the caller
- * inspects `exitCode`. Kills the process group on timeout.
- *
- * TODO(M1): implement with Bun.spawn, wire AbortSignal.timeout, capture streams.
+ * Spawn an argv array (no shell) inside `cwd`. Never throws on non-zero exit;
+ * the caller inspects `exitCode`. Kills the process on timeout and reports it.
  */
-export async function run(cmd: string, opts: ExecOptions): Promise<ExecResult> {
-  void cmd;
-  void opts;
-  void DEFAULT_TIMEOUT_SEC;
-  throw new Error("not implemented: exec.run (M1)");
+export async function spawn(argv: string[], opts: ExecOptions): Promise<ExecResult> {
+  const timeoutMs = (opts.timeoutSec ?? DEFAULT_TIMEOUT_SEC) * 1000;
+  let timedOut = false;
+
+  const proc = Bun.spawn(argv, {
+    cwd: opts.cwd,
+    env: opts.env ? { ...process.env, ...opts.env } : process.env,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+
+  const timer = setTimeout(() => {
+    timedOut = true;
+    proc.kill(9);
+  }, timeoutMs);
+
+  try {
+    const [stdout, stderr] = await Promise.all([
+      new Response(proc.stdout).text(),
+      new Response(proc.stderr).text(),
+    ]);
+    const exitCode = await proc.exited;
+    return { exitCode, stdout, stderr, timedOut };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Run a shell command string via `sh -c` inside `cwd`. */
+export function run(cmd: string, opts: ExecOptions): Promise<ExecResult> {
+  return spawn(["sh", "-c", cmd], opts);
 }

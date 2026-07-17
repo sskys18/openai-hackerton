@@ -64,8 +64,11 @@
 - [x] Demo fixture builds and plants a real regression (`make-demo.sh`).
 - [x] `git bisect run node test.mjs` identifies the planted culprit and resets clean.
       (Verified: culprit = "perf: tighten loop bound".)
-- [ ] MCP server boots and lists all four tools over stdio.
-- [ ] End-to-end run through Codex against the fixture.
+- [x] MCP server boots and lists all four tools over stdio with real JSON schemas.
+- [x] End-to-end `tools/call find_regression` on the fixture returns the culprit + resets clean.
+- [x] Unit tests: bisect pinpoint, clean-tree reset, applyCheck accept/reject (3 pass).
+- [ ] GPT-5.6 reasoning tools (explain_commit / propose_fix) - needs OPENAI_API_KEY (M3).
+- [ ] Full run through a live Codex session against the fixture.
 
 ## Links (fill before submitting)
 
